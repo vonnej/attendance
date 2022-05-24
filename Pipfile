@@ -8,6 +8,7 @@ uvicorn = "*"
 sqlalchemy = "*"
 fastapi = "*"
 pyjwt = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 
