@@ -1,4 +1,3 @@
-import templates as templates
 import uvicorn
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import HTMLResponse
