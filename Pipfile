@@ -9,6 +9,11 @@ sqlalchemy = "*"
 fastapi = "*"
 pyjwt = "*"
 mysql-connector-python = "*"
+requests = "*"
+python-dotenv = "*"
+passlib = "*"
+python-multipart = "*"
+jinja2 = "*"
 
 [dev-packages]
 

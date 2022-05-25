@@ -29,4 +29,10 @@ def login(username: str=Form(...), password: str=Form(...), db: Session=Depends(
     if (user is None) or (not auth_handler.verify_password(password, user_db.password)):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     token = auth_handler.encode_token(user_db.username)
+    # token = auth_handler.encode_token(username)
+    context = {}
+    context['authorization'] = token
+    # 관리자 페이지 렌더링 리턴할때 context도 같이 전달
+    # return templates.TemplateResponse("item.html", context)
+
     return {'token': token}
