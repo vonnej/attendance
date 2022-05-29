@@ -8,7 +8,6 @@ from backend.app.config.conn import get_db
 from backend.app.config.database import engine
 from backend.app.models.model_admin import Model_admin
 from backend.app.models.model_attendee import Model_attendee
-from backend.app.routes.security import auth_handler
 
 router = APIRouter()
 
@@ -25,13 +24,16 @@ def get_attendee_client(db: Session=Depends(get_db)):
 
 
 @router.get("/attendees/{attend_date}")   # 관리자: 해당일자 출석 데이터 조회(전체정보 출력)
-def get_attendee_by_day_(attend_date: date,
+def get_attendee_by_day(attend_date: date,
                          db: Session = Depends(get_db)):
     return db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == attend_date).all()
 
 users = session.query(Model_admin).all()   # list of tuples로 반환
 
-print(session.query(Model_attendee.attendee_name).all())
+
+@router.get("/attendees/{today}")
+def get_attendee_by_today(db: Session = Depends(get_db), today: date = datetime.now().date()):
+    return db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == today).all()
 
 def get_user_by_username(username: str):
     return session.query(Model_admin).filter(Model_admin.username == username).first()
@@ -45,7 +47,7 @@ def create_attendee(attendee_name: str = Form(...), db: Session =Depends(get_db)
                                  )
     db.add(attendee_db)  # 세션에 추가하고 커밋
     db.commit()
-    return RedirectResponse(url="/attendance_table", status_code=302)
+    return RedirectResponse(url="", status_code=302)
 
 
 @router.put("/attendees/update")
@@ -76,6 +78,7 @@ def delete_attendee_admin(attendee_name: str, attend_date: date,
         db.commit()
     else:
         raise HTTPException(status_code=500, detail="삭제할 이름이 없거나 날짜가 틀립니다")
+
 
     return "{} 삭제 완료!".format(attendee_name)
 
