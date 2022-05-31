@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, HTMLResponse
 
 from backend.app.config.conn import get_db
 from backend.app.config.database import engine
@@ -31,14 +31,15 @@ def get_attendee_by_day(attend_date: date,
 users = session.query(Model_admin).all()   # list of tuples로 반환
 
 
-@router.get("/attendees/{today}")
-def get_attendee_by_today(db: Session = Depends(get_db), today: date = datetime.now().date()):
+@router.get("/attendees_today")  # 당일 출석자 반환
+def get_attendee_by_today(db: Session = Depends(get_db)):
+    today = datetime.now().date()
     return db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == today).all()
 
 def get_user_by_username(username: str):
     return session.query(Model_admin).filter(Model_admin.username == username).first()
 
-@router.post("/attendees/create/")
+@router.post("/attendees/create/", response_class=HTMLResponse)
 def create_attendee(attendee_name: str = Form(...), db: Session =Depends(get_db)):    # 참석자: 출석 기능(당일 출석은 당일날만 가능)
         # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
     attendee_db = Model_attendee(attendee_name = attendee_name,
@@ -47,7 +48,7 @@ def create_attendee(attendee_name: str = Form(...), db: Session =Depends(get_db)
                                  )
     db.add(attendee_db)  # 세션에 추가하고 커밋
     db.commit()
-    return RedirectResponse(url="", status_code=302)
+    return RedirectResponse(url="/attend_success", status_code=302)
 
 
 @router.put("/attendees/update")
