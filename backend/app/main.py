@@ -107,7 +107,7 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     context['request'] = request
     context['token'] = access_token
     # # 관리자 페이지 렌더링 리턴할때 context도 같이 전달
-    return templates.TemplateResponse("login_success.html", context)
+    return templates.TemplateResponse("index_admin.html", context)
     # return {'access_token': access_token}
 
 

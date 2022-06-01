@@ -18,6 +18,8 @@
         xhr.open("GET",url,true)
         xhr.setRequestHeader("authorization", full_token)
         xhr.send()
+        window.location.replace( "http://localhost:8000/protected")
     </script>
+
 </body>
 </html>
