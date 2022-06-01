@@ -46,14 +46,16 @@
 <div id="current_date">
 
 </div>
+<div id="today_attendee">
+    
+</div>
 <script>
     var today = new Date();
     var comment = "오늘(" + String(today.getFullYear()) + "년" + String(today.getMonth()+1) + "월" + String(today.getDate()) + "일) 참석자"
     document.getElementById('current_date').innerHTML = comment
     fetch('http://localhost:8000/attendees_today')
-    .then(data => {
-        return data.json();
-    })
+    .then(res => res.text())
+    .then(text => {document.getElementById('today_attendee').innerHTML = text;})
     
 </script>
 <script>

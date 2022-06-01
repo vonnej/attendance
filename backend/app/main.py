@@ -14,8 +14,6 @@ from backend.app.routes import crud
 
 app = FastAPI()
 
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 auth_handler = AuthHandler()
 
 templates = Jinja2Templates(directory="templates")
@@ -46,7 +45,7 @@ def get_attendance_table_page(request: Request):   # 학부모들이 출석 완�
 def get_attend_success(request: Request):   # 출석 완료창
     return templates.TemplateResponse("attend_success.html", context= {"request": request})
 
-@app.get("/protected/attendance_table", response_class=HTMLResponse)
+@app.get("/attendance_table", response_class=HTMLResponse)
 def get_attendance_table_page(request: Request):   # 출석부화면
     return templates.TemplateResponse("attendance_table.html", context= {"request": request})
 
