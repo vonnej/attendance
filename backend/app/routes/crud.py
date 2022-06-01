@@ -42,10 +42,13 @@ def get_user_by_username(username: str):
 @router.post("/attendees/create/", response_class=HTMLResponse)
 def create_attendee(attendee_name: str = Form(...), db: Session =Depends(get_db)):    # 참석자: 출석 기능(당일 출석은 당일날만 가능)
         # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
+
     attendee_db = Model_attendee(attendee_name = attendee_name,
                                  attend_date = datetime.today(),
                                  create_time = datetime.now()
                                  )
+    # if attendee_db.attendee_name
+
     db.add(attendee_db)  # 세션에 추가하고 커밋
     db.commit()
     return RedirectResponse(url="/attend_success", status_code=302)
