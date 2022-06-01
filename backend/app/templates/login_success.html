@@ -2,11 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=http://0.0.0.0:8000/protected">
-    <script>alert("로그인 성공!!")</script>
+
+    <script>
+        alert("로그인 성공!!")
+    </script>
+
     <title>Title</title>
 </head>
 <body>
-
+    <script type="text/javascript">
+        var xhr = new XMLHttpRequest();
+        var url = 'http://localhost:8000/protected'
+        var token_str = "{{ token }}"
+        var full_token = "Bearer " + token_str
+        xhr.open("GET",url,true)
+        xhr.setRequestHeader("authorization", full_token)
+        xhr.send()
+    </script>
 </body>
 </html>
