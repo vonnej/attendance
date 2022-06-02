@@ -13,9 +13,6 @@
         table thead tr{
         width:100%;
         }
-        .container{
-        background-color : lightblue
-        }
 
     </style>
     <title>Calendar</title>
@@ -25,9 +22,7 @@
     <table id="calendar" border="1" cellpadding="0" cellspacing="0" class="month">
         <thead>
         <tr>
-            <th><label id="prev">&#60;</label></th>
-            <th align="center" id="current_year_month" colspan="5"></th>
-            <th><label id="next">&#62;</label></th>
+            <th align="center" id="current_year_month" colspan="7"></th>
         </tr>
         <tr>
             <th class="sun"><p style="color: red;"> Sun</p></th>
@@ -53,7 +48,7 @@
     var today = new Date();
     var comment = "오늘(" + String(today.getFullYear()) + "년" + String(today.getMonth()+1) + "월" + String(today.getDate()) + "일) 참석자"
     document.getElementById('current_date').innerHTML = comment
-    fetch('http://localhost:8000/attendees_today')
+    fetch('http://localhost:8000/return_attendees_today')
     .then(res => res.text())
     .then(text => {document.getElementById('today_attendee').innerHTML = text;})
     
@@ -100,6 +95,72 @@ function showCalendar(){
 showCalendar();
 
 currentTitle.innerHTML = today.getFullYear() + '.' + (today.getMonth() + 1);
+
+function prev(){
+    inputBox.value = "";
+    const $divs = document.querySelectorAll('#input-list > div');
+    $divs.forEach(function(e){
+      e.remove();
+    });
+    const $btns = document.querySelectorAll('#input-list > button');
+    $btns.forEach(function(e1){
+      e1.remove();
+    });
+    if(pageFirst.getMonth() === 1){
+        pageFirst = new Date(first.getFullYear()-1, 12, 1);
+        first = pageFirst;
+        if(first.getFullYear() % 4 === 0){
+            pageYear = leapYear;
+        }else{
+            pageYear = notLeapYear;
+        }
+    }else{
+        pageFirst = new Date(first.getFullYear(), first.getMonth()-1, 1);
+        first = pageFirst;
+    }
+    today = new Date(today.getFullYear(), today.getMonth()-1, today.getDate());
+    currentTitle.innerHTML = monthList[first.getMonth()] + '&nbsp;&nbsp;&nbsp;&nbsp;'+ first.getFullYear();
+    removeCalendar();
+    showCalendar();
+    showMain();
+    clickedDate1 = document.getElementById(today.getDate());
+    clickedDate1.classList.add('active');
+    clickStart();
+    reshowingList();
+}
+
+function next(){
+    inputBox.value = "";
+    const $divs = document.querySelectorAll('#input-list > div');
+    $divs.forEach(function(e){
+      e.remove();
+    });
+    const $btns = document.querySelectorAll('#input-list > button');
+    $btns.forEach(function(e1){
+      e1.remove();
+    });
+    if(pageFirst.getMonth() === 12){
+        pageFirst = new Date(first.getFullYear()+1, 1, 1);
+        first = pageFirst;
+        if(first.getFullYear() % 4 === 0){
+            pageYear = leapYear;
+        }else{
+            pageYear = notLeapYear;
+        }
+    }else{
+        pageFirst = new Date(first.getFullYear(), first.getMonth()+1, 1);
+        first = pageFirst;
+    }
+    today = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    currentTitle.innerHTML = monthList[first.getMonth()] + '&nbsp;&nbsp;&nbsp;&nbsp;'+ first.getFullYear();
+    removeCalendar();
+    showCalendar(); 
+    showMain();
+    clickedDate1 = document.getElementById(today.getDate());
+    clickedDate1.classList.add('active');  
+    clickStart();
+    reshowingList();
+}
 
 </script>
 </body>

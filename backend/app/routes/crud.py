@@ -8,33 +8,56 @@ from backend.app.config.conn import get_db
 from backend.app.config.database import engine
 from backend.app.models.model_admin import Model_admin
 from backend.app.models.model_attendee import Model_attendee
+from backend.app.config.auth import AuthHandler
+
 
 router = APIRouter()
 
 session = Session(bind=engine)
 
+auth_handler = AuthHandler()
+
 @router.get("/attendees")
 def get_attendee_client(db: Session=Depends(get_db)):
     return db.query(Model_attendee.attendee_name).all()
 
-# @router.get("/protected/attendees")
-# def get_attendee_admin(username=Depends(auth_handler.auth_wrapper),
-#                  db: Session = Depends(get_db)):   # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
-#     return db.query(Model_attendee.attendee_name, Model_attendee.attend_date).all()
+@router.get("/protected/attendees")
+def get_attendee_admin(username=Depends(auth_handler.auth_wrapper),
+                 db: Session = Depends(get_db)):   # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
+    return db.query(Model_attendee.attendee_name, Model_attendee.attend_date).all()
 
 
-@router.get("/attendees/{attend_date}")   # 관리자: 해당일자 출석 데이터 조회(전체정보 출력)
+@router.get("/attendees/{attend_date}")   # 해당일자 출석자 이름 조회
 def get_attendee_by_day(attend_date: date,
                          db: Session = Depends(get_db)):
-    return db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == attend_date).all()
+    attendee = db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == attend_date).all()
+    attendees = []
+
+    for i in range(len(attendee)):
+        attendees.append(attendee[i][0])
+
+    if len(attendees) > 0:
+        return attendees
+    else:
+        return "참석자가 없습니다"
 
 users = session.query(Model_admin).all()   # list of tuples로 반환
 
 
-@router.get("/attendees_today")  # 당일 출석자 반환
+@router.get("/return_attendees_today")  # 당일 출석자 반환
 def get_attendee_by_today(db: Session = Depends(get_db)):
     today = datetime.now().date()
-    return db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == today).all()
+    attendee = db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == today).all()
+    attendees = []
+
+    for i in range(len(attendee)):
+        attendees.append(attendee[i][0])
+
+    if len(attendees) > 0:
+        return attendees
+    else:
+        return "참석자가 없습니다"
+
 
 def get_user_by_username(username: str):
     return session.query(Model_admin).filter(Model_admin.username == username).first()

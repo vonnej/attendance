@@ -1,83 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <script defer="defer" src="https://pyscript.net/alpha/pyscript.js"></script>
     <style>
-        .month{
-        width:100%;
-        height:100%;
-        table-layout:fixed;
+        .month {
+            width: 100%;
+            height: 100%;
+            table-layout: fixed;
         }
-        table thead tr{
-        width:100%;
-        }
-        .container{
-        background-color : lightgreen
+
+        table thead tr {
+            width: 100%;
         }
     </style>
     <title>Calendar</title>
 </head>
+
 <body>
-<div class="container">
-    <table border="1" cellpadding="0" cellspacing="0" class="month">
-        <tr>
-            <th colspan="7" class="month">May 2022</th>
-        </tr>
-        <tr>
-            <th class="sun">Sun</th>
-            <th class="mon">Mon</th>
-            <th class="tue">Tue</th>
-            <th class="wed">Wed</th>
-            <th class="thu">Thu</th>
-            <th class="fri">Fri</th>
-            <th class="sat">Sat</th>
-        </tr>
-        <tr>
-            <td class="sun"><a href="/attendees">1</a></td>
-            <td class="mon">2</td>
-            <td class="tue">3</td>
-            <td class="wed">4</td>
-            <td class="thu">5</td>
-            <td class="fri">6</td>
-            <td class="sat">7</td>
-        </tr>
-        <tr>
-            <td class="sun">8</td>
-            <td class="mon">9</td>
-            <td class="tue">10</td>
-            <td class="wed">11</td>
-            <td class="thu">12</td>
-            <td class="fri">13</td>
-            <td class="sat">14</td>
-        </tr>
-        <tr>
-            <td class="sun">15</td>
-            <td class="mon">16</td>
-            <td class="tue">17</td>
-            <td class="wed">18</td>
-            <td class="thu">19</td>
-            <td class="fri">20</td>
-            <td class="sat">21</td>
-        </tr>
-        <tr>
-            <td class="sun">22</td>
-            <td class="mon">23</td>
-            <td class="tue">24</td>
-            <td class="wed">25</td>
-            <td class="thu">26</td>
-            <td class="fri">27</td>
-            <td class="sat">28</td>
-        </tr>
-        <tr>
-            <td class="sun">29</td>
-            <td class="mon">30</td>
-            <td class="tue">31</td>
-            <td class="noday">&nbsp;</td>
-            <td class="noday">&nbsp;</td>
-            <td class="noday">&nbsp;</td>
-            <td class="noday">&nbsp;</td>
-        </tr>
-    </table>
-</div>
+    <div class="calendar">
+        <table id="calendar" border="1" class="month">
+            <thead>
+                <tr>
+                    <th align="center" onclick="prev()">저번달
+                    </th>
+                    <th align="center" id="current_year_month" colspan="5"></th>
+                    <th align="center" onclick="next()">다음달</th>
+                </tr>
+                <tr>
+                    <th class="sun">
+                        <p style="color: red;">
+                            Sun</p>
+                    </th>
+                    <th class="mon">Mon</th>
+                    <th class="tue">Tue</th>
+                    <th class="wed">Wed</th>
+                    <th class="thu">Thu</th>
+                    <th class="fri">Fri</th>
+                    <th class="sat">
+                        <p style="color: blue;">
+                            Sat</p>
+                    </th>
+                </tr>
+            </thead>
+            <!-- <tbody id="calendar_body" class="calendar_body"></tbody> -->
+        </table>
+    </div>
+    <div style="color:green">*날짜칸을 클릭하면 해당날짜 출석자 열람 가능*</div><br>
+    <div id="current_date"></div>
+    <div id="today_attendee"></div><br>
+    <script>
+        var today = new Date();
+        var comment = "오늘(" + String(today.getFullYear()) + "-" + String(
+            today.getMonth() + 1
+        ) + "-" + String(today.getDate()) + ") 참석자"
+        document
+            .getElementById('current_date')
+            .innerHTML = comment;
+        fetch('http://localhost:8000/return_attendees_today')
+            .then(res => res.text())
+            .then(text => {
+                document
+                    .getElementById('today_attendee')
+                    .innerHTML = text;
+            })
+    </script>
+    <div id="selected_date"></div>
+    <div id="attendee_by_date"></div><br>
+
+    <div id="back_to_main">
+        <input type="button" value="메인으로" onclick="location.href='http://localhost:8000/'">
+    </div>
+
+    <script type="text/javascript">
+        var today = new Date(); //오늘 날짜
+        var date = new Date(); //today의 Date를 세어주는 역할
+
+        function click_on_date(td_id) {
+            var comm = "선택한 날짜(" + String(td_id) + ") 참석자";
+            document
+                .getElementById('selected_date')
+                .innerHTML = comm;
+            url = 'http://localhost:8000/attendees/' + String(td_id);
+            fetch(url)
+                .then(res => res.text())
+                .then(text => {
+                    document
+                        .getElementById('attendee_by_date')
+                        .innerHTML = text;
+                })
+        }
+
+        function prev() { //이전 달
+            today = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            buildCalendar(); 
+        }
+
+        function next() { //다음 달
+            today = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+            buildCalendar(); 
+        }
+
+        function buildCalendar() { //현재 달 달력 만들기
+            var first_date = new Date(today.getFullYear(), today.getMonth(), 1);
+            var last_date = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            var calendar_tb = document.getElementById("calendar");
+            var current_title = document.getElementById("current_year_month");
+            current_title.innerHTML = today.getFullYear() + "년 " + (
+                today.getMonth() + 1
+            ) + "월";
+
+            while (calendar_tb.rows.length > 2) {
+                calendar_tb.deleteRow(calendar_tb.rows.length - 1);
+            }
+            var row = null;
+            row = calendar_tb.insertRow();
+            var cnt = 0; // count, 셀의 갯수
+            for (i = 0; i < first_date.getDay(); i++) {
+                cell = row.insertCell(); 
+                cnt = cnt + 1; 
+            }
+            /*달력 출력*/
+            for (i = 1; i <= last_date.getDate(); i++) {
+                //1일부터 마지막 일까지 돌림
+                cell = row.insertCell(); //열 한칸한칸 계속 만들어주는 역할
+                cell.setAttribute('id', String(today.getFullYear()) + "-" + String(
+                    today.getMonth() + 1
+                ) + "-" + String(i));
+                cell.setAttribute('onclick', 'click_on_date(this.id)');
+                cell.innerHTML = i; 
+                cnt = cnt + 1; 
+                if (cnt % 7 == 1) {/*일요일 계산*/
+                    cell.innerHTML = "<font color=red>" + i
+                }
+                if (cnt % 7 == 0) {/* 1주일이 7일 이므로 토요일 구하기*/
+                    cell.innerHTML = "<font color=blue>" + i
+                    row = calendar.insertRow();
+                }
+                /*오늘의 날짜에 노란색 칠하기*/
+                if (today.getFullYear() == date.getFullYear() && today.getMonth() == date.getMonth() && i == date.getDate()) {
+                    cell.bgColor = "#FAF58C"; //셀의 배경색을 노랑으로
+                }
+            }
+        }
+
+        buildCalendar();
+    </script>
 </body>
+
 </html>

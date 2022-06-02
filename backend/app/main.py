@@ -40,9 +40,9 @@ def get_main_admin(request: Request, ):   # 관리자 메인화면
     return templates.TemplateResponse("index_admin.html", context= {"request": request})
 
 
-@app.get("/attendee_today/", response_class=HTMLResponse)
+@app.get("/attendees_today/", response_class=HTMLResponse)
 def get_attendance_table_page(request: Request):   # 학부모들이 출석 완료 후 보여지는 화면
-    return templates.TemplateResponse("attendee_today.html", context= {"request": request})
+    return templates.TemplateResponse("attendees_today.html", context= {"request": request})
 
 
 @app.get("/attend_success", response_class=HTMLResponse)
@@ -51,8 +51,8 @@ def get_attend_success(request: Request):   # 출석 완료창
 
 
 @app.get("/attendance_table", response_class=HTMLResponse)
-def get_attendance_table_page(request: Request):   # 출석부화면
-    return templates.TemplateResponse("attendance_table.html", context= {"request": request})
+def get_attendance_table_page(request: Request):   # 관리자 출석부 테이블
+    return templates.TemplateResponse("attendance_table_admin.html", context= {"request": request})
 
 
 @app.get("/login_page/", response_class=HTMLResponse)
@@ -90,6 +90,17 @@ def register(username: str, password: str, db: Session = Depends(get_db)):
     db.commit()
     return
 
+@app.get('/token')
+def get_token(username: str, password: str, db: Session = Depends(get_db)):
+    user_db = db.query(Model_admin).filter(Model_admin.username == username).first()
+    user = None
+    if user_db:
+        user = username
+    if (user is None) or (not auth_handler.verify_password(password, user_db.password)):
+        raise HTTPException(status_code=401, detail="계정명 또는 비번이 잘못됐습니다")
+    token = auth_handler.encode_token(username)
+    return token
+
 
 @app.post('/login/', response_class=HTMLResponse)  # 관리자 로그인
 def login(request: Request, username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
@@ -99,7 +110,7 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     if user_db:
         user = username
     if (user is None) or (not auth_handler.verify_password(password, user_db.password)):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="계정명 또는 비번이 잘못됐습니다")
 
     # token = dict(Authorization=f"Bearer {auth_handler.encode_token(user_db.username)}")
     access_token = auth_handler.encode_token(username)
