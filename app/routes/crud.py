@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse, HTMLResponse
 
-from backend.app.config.conn import get_db
-from backend.app.config.database import engine
-from backend.app.models.model_admin import Model_admin
-from backend.app.models.model_attendee import Model_attendee
-from backend.app.config.auth import AuthHandler
+from app.config.auth import AuthHandler
+from app.config.conn import get_db
+from app.config.database import engine
+from app.models.model_admin import Model_admin
+from app.models.model_attendee import Model_attendee
 
 
 router = APIRouter()

@@ -1,8 +1,9 @@
 /.env
 /test2.py
 /test3.py
-/backend/app/templates/calendar.js
-/backend/app/templates/calendar.html
+/app/templates/calendar.js
+/app/templates/calendar.html
 /test.py
-/backend/app/templates/test.html
-/backend/app/templates/calendartest.html
+/app/templates/test.html
+/app/templates/calendartest.html
+/test4.py

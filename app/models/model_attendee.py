@@ -1,6 +1,6 @@
 from sqlalchemy import String, Date, DateTime, Column
 
-from backend.app.config.database import Base
+from app.config.database import Base
 
 
 class Model_attendee(Base):

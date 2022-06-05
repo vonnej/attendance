@@ -130,7 +130,14 @@
                     today.getMonth() + 1
                 ) + "-" + String(i));
                 cell.setAttribute('onclick', 'click_on_date(this.id)');
-                cell.innerHTML = i; 
+                cell.innerHTML = i;
+                // url = 'http://localhost:8000/attendees/' + String(cell.id);
+                // fetch(url)
+                // .then(res => res.text())
+                // .then(text => {
+                //     document
+                //         .getElementById(cell.id)
+                //         .innerHTML = text;});
                 cnt = cnt + 1; 
                 if (cnt % 7 == 1) {/*일요일 계산*/
                     cell.innerHTML = "<font color=red>" + i
@@ -147,6 +154,18 @@
         }
 
         buildCalendar();
+
+        function print_on_td(td_id){
+            url = 'http://localhost:8000/attendees/' + String(td_id);
+            fetch(url)
+                .then(res => res.text())
+                .then(text => {
+                    document
+                        .getElementById(td_id)
+                        .innerHTML = text;
+                })
+        }
+        print_on_td();
     </script>
 </body>
 
