@@ -17,7 +17,7 @@
         var full_token = "Bearer " + token_str;
         console.log(full_token);
         xhr.open("GET",url,true);
-        xhr.setRequestHeader("Authorization", "full_token");
+        xhr.setRequestHeader("Authorization", full_token);
         xhr.send();
         window.location.replace("http://localhost:8000/protected");
     </script>

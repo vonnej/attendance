@@ -11,6 +11,7 @@ from app.config.auth import AuthHandler
 from app.config.conn import get_db
 from app.models.model_admin import Model_admin
 from app.routes import crud
+from auth_wrapper import AuthWrapperClass
 
 app = FastAPI()
 
@@ -22,63 +23,60 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = AuthWrapperClass()
 
 auth_handler = AuthHandler()
 
 security = HTTPBearer()
 
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="./templates")
 app.include_router(crud.router)
 # app.include_router(security.router)
 
 
 @app.get("/", response_class=HTMLResponse)
 def get_main_page(request: Request):    # 메인화면
-    return templates.TemplateResponse("index.html", context= {"request": request})
+    return templates.TemplateResponse("index.html", context={"request": request})
 
 
 @app.get("/index_admin", response_class=HTMLResponse)
 def get_main_admin(request: Request, ):   # 관리자 메인화면
-    return templates.TemplateResponse("index_admin.html", context= {"request": request})
+    return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
 @app.get("/attendees_today/", response_class=HTMLResponse)
 def get_attendance_table_page(request: Request):   # 학부모들이 출석 완료 후 보여지는 화면
-    return templates.TemplateResponse("attendees_today.html", context= {"request": request})
+    return templates.TemplateResponse("attendees_today.html", context={"request": request})
 
 
 @app.get("/attend_success", response_class=HTMLResponse)
 def get_attend_success(request: Request):   # 출석 완료창
-    return templates.TemplateResponse("attend_success.html", context= {"request": request})
+    return templates.TemplateResponse("attend_success.html", context={"request": request})
 
 
 @app.get("/attendance_table", response_class=HTMLResponse)
 def get_attendance_table_page(request: Request):   # 관리자 출석부 테이블
-    return templates.TemplateResponse("attendance_table_admin.html", context= {"request": request})
+    return templates.TemplateResponse("attendance_table_admin.html", context={"request": request})
 
 
 @app.get("/login_page/", response_class=HTMLResponse)
 def get_login_page(request: Request):   # 로그인화면
-    return templates.TemplateResponse("login.html", context= {"request": request})
+    return templates.TemplateResponse("login.html", context={"request": request})
 
 
 @app.get("/attend/", response_class=HTMLResponse)
 def get_attend_input_page(request: Request):  # 출석등록 화면
-    return templates.TemplateResponse("attend.html", context= {"request": request})
-
-
+    return templates.TemplateResponse("attend.html", context={"request": request})
 
 
 @app.get("/protected", response_class=HTMLResponse)
 def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
     # token = auth_handler.encode_token(username)
-    return {"token" : token}
-    # return templates.TemplateResponse("index_admin.html", context= {"request": request, "username": username})
+    return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
 @app.post('/secret')
-def secret(username = Depends(auth_handler.auth_wrapper)):
+def secret(username=Depends(auth_handler.auth_wrapper)):
     return {"username": username}
 
 
@@ -88,11 +86,11 @@ def register(username: str, password: str, db: Session = Depends(get_db)):
     if user_db:
         raise HTTPException(status_code=400, detail='Username is taken')
     hashed_password = auth_handler.get_password_hash(password)
-    admin_db = Model_admin(username = username,
-                           password = hashed_password)
+    admin_db = Model_admin(username=username, password=hashed_password)
     db.add(admin_db)
     db.commit()
     return username
+
 
 @app.get('/token')
 def get_token(username: str, password: str, db: Session = Depends(get_db)):
