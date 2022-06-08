@@ -69,9 +69,34 @@
     </script>
     <div id="selected_date"></div>
     <div id="attendee_by_date"></div><br>
-
+    <div id="add">
+        <form action="/attendees/create_by_date/" method="post">
+            추가 :&nbsp;
+            <input type="text" name="attendee_name" placeholder="추가할 이름">
+            <input type="date" name="attend_date" placeholder="참석 날짜">
+            <input type="submit" value="추가">
+        </form>
+    </div><br>
+    <div id="delete">
+        <form action="/attendees/delete/" method="post">
+            삭제 :&nbsp;
+            <input type="text" name="attendee_name" placeholder="삭제할 기존 참석자 이름">
+            <input type="date" name="attend_date" placeholder="참석 날짜(YYYY-MM-DD)">
+            <input type="submit" value="삭제">
+        </form>
+    </div><br>
+    <div id="modify">
+        <form action="/attendees/update/" method="post">
+            수정 :&nbsp;
+            <input type="text" name="attendee_name" placeholder="수정할 기존 참석자 이름">
+            <input type="date" name="attend_date" placeholder="참석 날짜(YYYY-MM-DD)">
+            <input type="text" name="new_name" placeholder="변경하고픈 이름">
+            <input type="submit" value="수정">
+        </form>
+    </div><br>
+    
     <div id="back_to_main">
-        <input type="button" value="메인으로" onclick="location.href='http://localhost:8000/'">
+        <input type="button" value="메인으로(관리자)" onclick="location.href='http://localhost:8000/protected'">
     </div>
 
     <script type="text/javascript">

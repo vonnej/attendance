@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request, Depends, Form, HTTPException
 from fastapi.responses import HTMLResponse
-from fastapi.security import HTTPBearer, OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -11,7 +10,7 @@ from app.config.auth import AuthHandler
 from app.config.conn import get_db
 from app.models.model_admin import Model_admin
 from app.routes import crud
-from auth_wrapper import AuthWrapperClass
+from app.config.auth_wrapper import AuthWrapperClass
 
 app = FastAPI()
 
@@ -27,9 +26,7 @@ oauth2_scheme = AuthWrapperClass()
 
 auth_handler = AuthHandler()
 
-security = HTTPBearer()
-
-templates = Jinja2Templates(directory="./templates")
+templates = Jinja2Templates(directory="app/templates")
 app.include_router(crud.router)
 # app.include_router(security.router)
 
@@ -71,7 +68,6 @@ def get_attend_input_page(request: Request):  # 출석등록 화면
 
 @app.get("/protected", response_class=HTMLResponse)
 def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
-    # token = auth_handler.encode_token(username)
     return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
@@ -129,5 +125,3 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
-
-
