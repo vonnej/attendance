@@ -13,10 +13,10 @@
     <script type="text/javascript">
         var xhr = new XMLHttpRequest();
         var url = 'http://localhost:8000/protected';
-        var token_str = "" + {{ token }};
+        var token_str = "{{ token }}"
         var full_token = "Bearer " + token_str;
         console.log(full_token);
-        xhr.open("GET", url, true);
+        xhr.open("GET",url,true);
         xhr.setRequestHeader("Authorization", full_token);
         xhr.send();
         window.location.replace("http://localhost:8000/protected");

@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, Request, Depends, Form, HTTPException
 from fastapi.responses import HTMLResponse
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
@@ -11,6 +11,7 @@ from app.config.auth import AuthHandler
 from app.config.conn import get_db
 from app.models.model_admin import Model_admin
 from app.routes import crud
+from auth_wrapper import AuthWrapperClass
 
 app = FastAPI()
 
@@ -22,11 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = AuthWrapperClass()
 
 auth_handler = AuthHandler()
 
-templates = Jinja2Templates(directory="app/templates")
+security = HTTPBearer()
+
+templates = Jinja2Templates(directory="./templates")
 app.include_router(crud.router)
 # app.include_router(security.router)
 
@@ -67,15 +70,9 @@ def get_attend_input_page(request: Request):  # 출석등록 화면
 
 
 @app.get("/protected", response_class=HTMLResponse)
-def get_main_admin(request: Request, token: str = Depends(auth_handler.auth_wrapper)):
-    # authorization = request.headers.get('')
-    # if not authorization:
-    # return {"token" : token}
-    #     raise HTTPException(status_code=401)
-    # access_token = request.get_cookie("access_token")
-
-    return templates.TemplateResponse("index_admin.html", context={"request": request, "token": token})
-    # return authorization
+def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
+    # token = auth_handler.encode_token(username)
+    return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
 @app.post('/secret')
@@ -89,8 +86,7 @@ def register(username: str, password: str, db: Session = Depends(get_db)):
     if user_db:
         raise HTTPException(status_code=400, detail='Username is taken')
     hashed_password = auth_handler.get_password_hash(password)
-    admin_db = Model_admin(username=username,
-                           password=hashed_password)
+    admin_db = Model_admin(username=username, password=hashed_password)
     db.add(admin_db)
     db.commit()
     return username
@@ -119,19 +115,19 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
         # raise HTTPException(status_code=401, detail="계정명 또는 비번이 잘못됐습니다")
         return templates.TemplateResponse("login_failure.html", {"request": request})
     # token = dict(Authorization=f"Bearer {auth_handler.encode_token(user_db.username)}")
-    token: str = auth_handler.encode_token(username)
+    token = auth_handler.encode_token(username)
     # context = {}
     # context['request'] = request
     # context['token'] = access_token
     # # 관리자 페이지 렌더링 리턴할때 context도 같이 전달
     response = RedirectResponse("/protected", status_code=302)
-    response.set_cookie(key="access_token", value=token, httponly=True)
-    # response.set_cookie(key="Authorization", value="Bearer {}".format(token), httponly=True)
-    # return response
-
+    response.set_cookie(key="access_token", value="Bearer {}".format(token), httponly=True)
+    return response
     # return templates.TemplateResponse("login_success.html", context={"request": request, "token": token})
     # return {'access_token': access_token}
 
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+
