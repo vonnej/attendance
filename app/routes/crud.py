@@ -79,18 +79,22 @@ def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = 
 
 
 @router.post("/attendees/create/", response_class=HTMLResponse)
-def create_attendee(attendee_name: str = Form(...), db: Session = Depends(get_db)):  # 참석자: 출석 기능(당일 출석은 당일날만 가능)
+def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime.today(),
+                    db: Session = Depends(get_db)):  # 참석자: 출석 기능(당일 출석은 당일날만 가능)
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
+    attendee = db.query(Model_attendee).get((attendee_name, attend_date))
+    if attendee:
+        raise HTTPException(status_code=500, detail="중복된 이름입니다")
+        # return RedirectResponse(url="create_duplicate.html", status_code=302)
+    if not attendee:
+        attendee_db = Model_attendee(attendee_name=attendee_name,
+                                     attend_date=datetime.today(),
+                                     create_time=datetime.now()
+                                     )
 
-    attendee_db = Model_attendee(attendee_name=attendee_name,
-                                 attend_date=datetime.today(),
-                                 create_time=datetime.now()
-                                 )
-    # if attendee_db.attendee_name
-
-    db.add(attendee_db)  # 세션에 추가하고 커밋
-    db.commit()
-    # return RedirectResponse(url="/attend_success", status_code=302)
+        db.add(attendee_db)  # 세션에 추가하고 커밋
+        db.commit()
+        return RedirectResponse(url="/attend_success", status_code=302)
 
 
 @router.post("/attendees/update", response_class=HTMLResponse)
@@ -122,5 +126,5 @@ def delete_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
     else:
         raise HTTPException(status_code=500, detail="삭제할 이름이 없거나 날짜가 틀립니다")
 
-    # return RedirectResponse(url="/attendance_table", status_code=302)
+    return RedirectResponse(url="/attendance_table", status_code=302)
     # return "{} 삭제 완료!".format(attendee_name)
