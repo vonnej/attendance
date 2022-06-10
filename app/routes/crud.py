@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse, HTMLResponse
 
 from app.config.auth import AuthHandler
+from app.config.auth_wrapper import AuthWrapperClass
 from app.config.conn import get_db
 from app.config.database import engine
 from app.models.model_admin import Model_admin
@@ -15,6 +16,8 @@ router = APIRouter()
 session = Session(bind=engine)
 
 auth_handler = AuthHandler()
+
+oauth2_scheme = AuthWrapperClass()
 
 
 @router.get("/attendees")
@@ -67,7 +70,7 @@ def get_user_by_username(username: str):
 
 @router.post("/attendees/create_by_date", response_class=HTMLResponse)
 def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = Form(...),
-                            db: Session = Depends(get_db)):
+                            db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
 
     attendee_db = Model_attendee(attendee_name=attendee_name,
                                  attend_date=attend_date,
@@ -83,7 +86,8 @@ def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime
                     db: Session = Depends(get_db)):  # 참석자: 출석 기능(당일 출석은 당일날만 가능)
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
     attendee = db.query(Model_attendee).get((attendee_name, attend_date))
-    if attendee:
+
+    if attendee_name == attendee.attendee_name:
         raise HTTPException(status_code=500, detail="중복된 이름입니다")
         # return RedirectResponse(url="create_duplicate.html", status_code=302)
     if not attendee:
@@ -94,12 +98,13 @@ def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime
 
         db.add(attendee_db)  # 세션에 추가하고 커밋
         db.commit()
-        return RedirectResponse(url="/attend_success", status_code=302)
+
+    return RedirectResponse(url="/attend_success", status_code=302)
 
 
 @router.post("/attendees/update", response_class=HTMLResponse)
 def update_attendee_admin(attendee_name: str = Form(...), attend_date: date = Form(...), new_name: str = Form(...),
-                          db: Session = Depends(get_db)):  # 관리자: 출석내용 수정기능(이름 수정)
+                          db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):  # 관리자: 출석내용 수정기능(이름 수정)
 
     attendee = db.query(Model_attendee).get((attendee_name, attend_date))
 
@@ -116,7 +121,7 @@ def update_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
 
 @router.post("/attendees/delete", response_class=HTMLResponse)
 def delete_attendee_admin(attendee_name: str = Form(...), attend_date: date = Form(...),
-                          db: Session = Depends(get_db)):  # 관리자: 참석자 삭제
+                          db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):  # 관리자: 참석자 삭제
 
     attendee = db.query(Model_attendee).get((attendee_name, attend_date))
 

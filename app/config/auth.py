@@ -9,11 +9,11 @@ from passlib.context import CryptContext
 
 load_dotenv(verbose=True)
 
+
 class AuthHandler():
     security = HTTPBearer()
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     secret = os.getenv('secret')
-
 
     def get_password_hash(self, password):
         return self.pwd_context.hash(password)

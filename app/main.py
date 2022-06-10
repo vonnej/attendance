@@ -51,8 +51,8 @@ def get_attend_success(request: Request):   # 출석 완료창
     return templates.TemplateResponse("attend_success.html", context={"request": request})
 
 
-@app.get("/attendance_table", response_class=HTMLResponse)
-def get_attendance_table_page(request: Request):   # 관리자 출석부 테이블
+@app.get("/protected/attendance_table", response_class=HTMLResponse)
+def get_attendance_table_page(request: Request, token: str = Depends(oauth2_scheme)):   # 관리자 출석부 테이블
     return templates.TemplateResponse("attendance_table_admin.html", context={"request": request})
 
 
@@ -121,6 +121,13 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     return response
     # return templates.TemplateResponse("login_success.html", context={"request": request, "token": token})
     # return {'access_token': access_token}
+
+
+@app.get('/logout', response_class=HTMLResponse)
+def logout():
+    response = RedirectResponse("/", status_code=302)
+    response.delete_cookie("access_token")
+    return response
 
 
 if __name__ == "__main__":
