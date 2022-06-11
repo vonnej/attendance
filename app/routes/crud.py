@@ -87,7 +87,7 @@ def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
     attendee = db.query(Model_attendee).get((attendee_name, attend_date))
 
-    if attendee_name == attendee.attendee_name:
+    if attendee:
         raise HTTPException(status_code=500, detail="중복된 이름입니다")
         # return RedirectResponse(url="create_duplicate.html", status_code=302)
     if not attendee:
