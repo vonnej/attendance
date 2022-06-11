@@ -36,8 +36,8 @@ def get_main_page(request: Request):    # 메인화면
     return templates.TemplateResponse("index.html", context={"request": request})
 
 
-@app.get("/index_admin", response_class=HTMLResponse)
-def get_main_admin(request: Request, ):   # 관리자 메인화면
+@app.get("/protected/index_admin", response_class=HTMLResponse)
+def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):   # 관리자 메인화면
     return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
@@ -71,13 +71,9 @@ def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
     return templates.TemplateResponse("index_admin.html", context={"request": request})
 
 
-@app.post('/secret')
-def secret(username=Depends(auth_handler.auth_wrapper)):
-    return {"username": username}
-
-
 @app.post("/register")   # 관리자 계정 생성
-def register(username: str, password: str, db: Session = Depends(get_db)):
+def register(username: str, password: str, db: Session = Depends(get_db),
+             token: str = Depends(oauth2_scheme)):
     user_db = db.query(Model_admin).filter(Model_admin.username == username).all()
     if user_db:
         raise HTTPException(status_code=400, detail='Username is taken')
@@ -124,7 +120,7 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
 
 
 @app.get('/logout', response_class=HTMLResponse)
-def logout():
+def logout(token: str = Depends(oauth2_scheme)):
     response = RedirectResponse("/", status_code=302)
     response.delete_cookie("access_token")
     return response

@@ -27,13 +27,13 @@ def get_attendee_client(db: Session = Depends(get_db)):
 
 @router.get("/protected/attendees")
 def get_attendee_admin(username=Depends(auth_handler.auth_wrapper),
-                       db: Session = Depends(get_db)):  # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
+                       db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):  # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
     return db.query(Model_attendee.attendee_name, Model_attendee.attend_date).all()
 
 
 @router.get("/attendees/{attend_date}")  # 해당일자 출석자 이름 조회
-def get_attendee_by_day(attend_date: date,
-                        db: Session = Depends(get_db)):
+def get_attendee_by_day(attend_date: date, db: Session = Depends(get_db),
+                        token: str = Depends(oauth2_scheme)):
     attendee = db.query(Model_attendee.attendee_name).filter(Model_attendee.attend_date == attend_date).all()
     attendees = []
 
