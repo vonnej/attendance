@@ -78,7 +78,7 @@ def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = 
     db.add(attendee_db)
     db.commit()
 
-    return RedirectResponse(url="/attendance_table", status_code=302)
+    return RedirectResponse(url="/protected/attendance_table", status_code=302)
 
 
 @router.post("/attendees/create/", response_class=HTMLResponse)
@@ -116,7 +116,7 @@ def update_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
     if not attendee:
         raise HTTPException(status_code=500, detail="참석자가 존재하지 않거나 날짜가 다릅니다")  # 코드 수정 404 아님 인터널 에러로 변경
 
-    return RedirectResponse(url="/attendance_table", status_code=302)
+    return RedirectResponse(url="/protected/attendance_table", status_code=302)
 
 
 @router.post("/attendees/delete", response_class=HTMLResponse)
@@ -131,5 +131,5 @@ def delete_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
     else:
         raise HTTPException(status_code=500, detail="삭제할 이름이 없거나 날짜가 틀립니다")
 
-    return RedirectResponse(url="/attendance_table", status_code=302)
+    return RedirectResponse(url="/protected/attendance_table", status_code=302)
     # return "{} 삭제 완료!".format(attendee_name)
