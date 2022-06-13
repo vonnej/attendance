@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <script defer="defer" src="https://pyscript.net/alpha/pyscript.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .month {
             width: 100%;
@@ -96,7 +95,7 @@
     </div><br>
     
     <div id="back_to_main">
-        <input type="button" value="메인으로(관리자)" onclick="location.href='http://3.34.4.31/protected'">
+<!--        <input type="button" value="메인으로(관리자)" onclick="location.href='http://3.34.4.31/protected'">-->
         <input type="submit" value="로그아웃" onclick="location.href='http://3.34.4.31/logout'">
     </div>
 
@@ -157,14 +156,7 @@
                 ) + "-" + String(i));
                 cell.setAttribute('onclick', 'click_on_date(this.id)');
                 cell.innerHTML = i;
-                // url = 'http://localhost:8000/attendees/' + String(cell.id);
-                // fetch(url)
-                // .then(res => res.text())
-                // .then(text => {
-                //     document
-                //         .getElementById(cell.id)
-                //         .innerHTML = text;});
-                cnt = cnt + 1; 
+                cnt = cnt + 1;
                 if (cnt % 7 == 1) {/*일요일 계산*/
                     cell.innerHTML = "<font color=red>" + i
                 }

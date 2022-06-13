@@ -1,5 +1,6 @@
 from datetime import date, datetime
 
+import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse, HTMLResponse
@@ -89,23 +90,33 @@ def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = 
 def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime.today(),
                     db: Session = Depends(get_db)):  # 참석자: 출석 기능(당일 출석은 당일날만 가능)
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
-    attendee = db.query(Model_attendee).get((attendee_name, attend_date))
-
-    # if attendee:
-    #     raise HTTPException(status_code=500, detail="중복된 이름입니다")
-    #     # return RedirectResponse(url="create_duplicate.html", status_code=302)
-    if not attendee:
+    # attendee = db.query(Model_attendee).get((attendee_name, attend_date))
+    try:
         attendee_db = Model_attendee(attendee_name=attendee_name,
-                                     attend_date=datetime.today(),
+                                     attend_date=attend_date,
                                      create_time=datetime.now()
                                      )
         db.add(attendee_db)  # 세션에 추가하고 커밋
         db.commit()
 
-    else:
-        # raise HTTPException(status_code=500, detail="중복된 이름입니다")
+        return RedirectResponse(url="/attendees_today", status_code=302)
+
+    except sqlalchemy.exc.IntegrityError:
+        db.rollback()
         return RedirectResponse(url="/create_duplicate", status_code=302)
-    return RedirectResponse(url="/attend_success", status_code=302)
+
+    # if not attendee:
+    #     attendee_db = Model_attendee(attendee_name=attendee_name,
+    #                                  attend_date=attend_date,
+    #                                  create_time=datetime.now()
+    #                                  )
+    #     db.add(attendee_db)  # 세션에 추가하고 커밋
+    #     db.commit()
+    #
+    #     return RedirectResponse(url="/attendees_today", status_code=302)
+    #
+    # else:
+    #     return RedirectResponse(url="/create_duplicate", status_code=302)
 
 
 @router.post("/attendees/update", response_class=HTMLResponse)
@@ -120,7 +131,7 @@ def update_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
         db.commit()  # 커밋하기
 
     if not attendee:
-        raise HTTPException(status_code=500, detail="참석자가 존재하지 않거나 날짜가 다릅니다")  # 코드 수정 404 아님 인터널 에러로 변경
+        return RedirectResponse(url="/update_failure", status_code=302)
 
     return RedirectResponse(url="/protected/attendance_table", status_code=302)
 

@@ -52,7 +52,7 @@ def get_create_duplicate_page(request: Request):   # 학부모 출석시 중복�
 
 
 @app.get("/create_duplicate_admin/", response_class=HTMLResponse)
-def get_create_duplicate_page(request: Request):   # 관리자 페이지에서 참석자 생성 시 중복된 이름이 있을 경우
+def get_create_duplicate_admin_page(request: Request):   # 관리자 페이지에서 참석자 생성 시 중복된 이름이 있을 경우
     return templates.TemplateResponse("create_duplicate_admin.html", context={"request": request})
 
 
