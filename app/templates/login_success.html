@@ -12,14 +12,14 @@
 <body>
     <script type="text/javascript">
         var xhr = new XMLHttpRequest();
-        var url = 'http://localhost:8000/protected';
+        var url = 'http://3.34.4.31/protected';
         var token_str = "{{ token }}"
         var full_token = "Bearer " + token_str;
         console.log(full_token);
         xhr.open("GET",url,true);
         xhr.setRequestHeader("Authorization", full_token);
         xhr.send();
-        window.location.replace("http://localhost:8000/protected");
+        window.location.replace("http://3.34.4.31/protected");
     </script>
 
 </body>

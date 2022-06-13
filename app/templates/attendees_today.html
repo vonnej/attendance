@@ -10,7 +10,7 @@
         <div id="today_attendee"></div>
         <br>
         <div id="back_to_main">
-            <input type="button" value="메인으로" onclick="location.href='http://localhost:8000/'">
+            <input type="button" value="메인으로" onclick="location.href='http://3.34.4.31/'">
         </div>
         <script>
             var today = new Date();
@@ -20,7 +20,7 @@
             document
                 .getElementById('div')
                 .innerHTML = comment
-            fetch('http://localhost:8000/return_attendees_today')
+            fetch('http://3.34.4.31/return_attendees_today')
                 .then(res => res.text())
                 .then(text => {
                     document

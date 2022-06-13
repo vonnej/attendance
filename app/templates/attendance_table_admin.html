@@ -58,7 +58,7 @@
         document
             .getElementById('current_date')
             .innerHTML = comment;
-        fetch('http://localhost:8000/return_attendees_today')
+        fetch('http://3.34.4.31/return_attendees_today')
             .then(res => res.text())
             .then(text => {
                 document
@@ -95,8 +95,8 @@
     </div><br>
     
     <div id="back_to_main">
-<!--        <input type="button" value="메인으로(관리자)" onclick="location.href='http://localhost:8000/protected'">-->
-        <input type="submit" value="로그아웃" onclick="location.href='http://localhost:8000/logout'">
+<!--        <input type="button" value="메인으로(관리자)" onclick="location.href='http://3.34.4.31/protected'">-->
+        <input type="submit" value="로그아웃" onclick="location.href='http://3.34.4.31/logout'">
     </div>
 
     <script type="text/javascript">
@@ -108,7 +108,7 @@
             document
                 .getElementById('selected_date')
                 .innerHTML = comm;
-            url = 'http://localhost:8000/attendees/' + String(td_id);
+            url = 'http://3.34.4.31/attendees/' + String(td_id);
             fetch(url)
                 .then(res => res.text())
                 .then(text => {
@@ -174,7 +174,7 @@
         buildCalendar();
 
         function print_on_td(td_id){
-            url = 'http://localhost:8000/attendees/' + String(td_id);
+            url = 'http://3.34.4.31/attendees/' + String(td_id);
             fetch(url)
                 .then(res => res.text())
                 .then(text => {
