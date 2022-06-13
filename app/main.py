@@ -46,6 +46,31 @@ def get_attendance_table_page(request: Request):   # 학부모들이 출석 완�
     return templates.TemplateResponse("attendees_today.html", context={"request": request})
 
 
+@app.get("/create_duplicate/", response_class=HTMLResponse)
+def get_create_duplicate_page(request: Request):   # 학부모 출석시 중복된 이름이 있을 경우
+    return templates.TemplateResponse("create_duplicate.html", context={"request": request})
+
+
+@app.get("/create_duplicate_admin/", response_class=HTMLResponse)
+def get_create_duplicate_page(request: Request):   # 관리자 페이지에서 참석자 생성 시 중복된 이름이 있을 경우
+    return templates.TemplateResponse("create_duplicate_admin.html", context={"request": request})
+
+
+@app.get("/delete_failure/", response_class=HTMLResponse)
+def get_delete_failure_page(request: Request):   # 참석자 삭제 실패시 뜨는 화면
+    return templates.TemplateResponse("delete_failure.html", context={"request": request})
+
+
+@app.get("/login_failure/", response_class=HTMLResponse)
+def get_login_failure_page(request: Request):   # 로그인 실패시 뜨는 화면
+    return templates.TemplateResponse("login_failure.html", context={"request": request})
+
+
+@app.get("/update_failure/", response_class=HTMLResponse)
+def get_update_failure_page(request: Request):   # 수정 실패시 뜨는 화면
+    return templates.TemplateResponse("update_failure.html", context={"request": request})
+
+
 @app.get("/attend_success", response_class=HTMLResponse)
 def get_attend_success(request: Request):   # 출석 완료창
     return templates.TemplateResponse("attend_success.html", context={"request": request})
@@ -112,7 +137,7 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     # context['request'] = request
     # context['token'] = access_token
     # # 관리자 페이지 렌더링 리턴할때 context도 같이 전달
-    response = RedirectResponse("/protected", status_code=302)
+    response = RedirectResponse("/protected/attendance_table", status_code=302)
     response.set_cookie(key="access_token", value="Bearer {}".format(token), httponly=True)
     return response
     # return templates.TemplateResponse("login_success.html", context={"request": request, "token": token})

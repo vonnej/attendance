@@ -25,9 +25,9 @@ def get_attendee_client(db: Session = Depends(get_db)):
     return db.query(Model_attendee.attendee_name).all()
 
 
-@router.get("/protected/attendees")
+@router.get("/protected/attendees")  # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
 def get_attendee_admin(username=Depends(auth_handler.auth_wrapper),
-                       db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):  # 관리자: 전체 출석 데이터 조회(이름, 날짜, 게시시간, 수정시간 모든 정보)
+                       db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     return db.query(Model_attendee.attendee_name, Model_attendee.attend_date).all()
 
 
@@ -71,12 +71,16 @@ def get_user_by_username(username: str):
 @router.post("/attendees/create_by_date", response_class=HTMLResponse)
 def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = Form(...),
                             db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    attendee = db.query(Model_attendee).get((attendee_name, attend_date))
+    if not attendee:
+        attendee_db = Model_attendee(attendee_name=attendee_name,
+                                     attend_date=attend_date,
+                                     create_time=datetime.now())
+        db.add(attendee_db)
+        db.commit()
 
-    attendee_db = Model_attendee(attendee_name=attendee_name,
-                                 attend_date=attend_date,
-                                 create_time=datetime.now())
-    db.add(attendee_db)
-    db.commit()
+    else:
+        return RedirectResponse(url="/create_duplicate_admin", status_code=302)
 
     return RedirectResponse(url="/protected/attendance_table", status_code=302)
 
@@ -87,18 +91,20 @@ def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
     attendee = db.query(Model_attendee).get((attendee_name, attend_date))
 
-    if attendee:
-        raise HTTPException(status_code=500, detail="중복된 이름입니다")
-        # return RedirectResponse(url="create_duplicate.html", status_code=302)
+    # if attendee:
+    #     raise HTTPException(status_code=500, detail="중복된 이름입니다")
+    #     # return RedirectResponse(url="create_duplicate.html", status_code=302)
     if not attendee:
         attendee_db = Model_attendee(attendee_name=attendee_name,
                                      attend_date=datetime.today(),
                                      create_time=datetime.now()
                                      )
-
         db.add(attendee_db)  # 세션에 추가하고 커밋
         db.commit()
 
+    else:
+        # raise HTTPException(status_code=500, detail="중복된 이름입니다")
+        return RedirectResponse(url="/create_duplicate", status_code=302)
     return RedirectResponse(url="/attend_success", status_code=302)
 
 
@@ -129,7 +135,6 @@ def delete_attendee_admin(attendee_name: str = Form(...), attend_date: date = Fo
         db.delete(attendee)
         db.commit()
     else:
-        raise HTTPException(status_code=500, detail="삭제할 이름이 없거나 날짜가 틀립니다")
+        return RedirectResponse(url="/delete_failure", status_code=302)
 
     return RedirectResponse(url="/protected/attendance_table", status_code=302)
-    # return "{} 삭제 완료!".format(attendee_name)
