@@ -14,6 +14,7 @@ python-dotenv = "*"
 passlib = "*"
 python-multipart = "*"
 jinja2 = "*"
+bcrypt = "*"
 
 [dev-packages]
 

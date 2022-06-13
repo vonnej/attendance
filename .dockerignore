@@ -1,4 +1,5 @@
-/.env
+.venv
+.env
 /test3.py
 /app/templates/calendar.js
 /app/templates/calendar.html
@@ -6,5 +7,4 @@
 /app/templates/test.html
 /app/templates/calendartest.html
 /test4.py
-.venv
 /test2.py
