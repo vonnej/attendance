@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>오늘 출석자</title>
+    </head>
+    <body>
+        <div id="div"></div>
+        <div id="today_attendee"></div>
+        <br>
+        <div id="back_to_main">
+            <input type="button" value="메인으로" onclick="location.href='http://3.34.4.31/'">
+        </div>
+        <script>
+            var today = new Date();
+            var comment = "오늘(" + String(today.getFullYear()) + "년" + String(
+                today.getMonth() + 1
+            ) + "월" + String(today.getDate()) + "일) 참석자"
+            document
+                .getElementById('div')
+                .innerHTML = comment
+            fetch('http://3.34.4.31/return_attendees_today')
+                .then(res => res.text())
+                .then(text => {
+                    document
+                        .getElementById('today_attendee')
+                        .innerHTML = text;
+                })
+        </script>
+    </body>
+</html>

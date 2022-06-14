@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 
-from backend.app.config.database import Base
+from app.config.database import Base
 
 
 class Model_admin(Base):
