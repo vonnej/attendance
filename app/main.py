@@ -98,7 +98,7 @@ def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
 
 @app.post("/register")   # 관리자 계정 생성
 def register(username: str, password: str, db: Session = Depends(get_db),
-             token: str = Depends(AuthHandler.auth_wrapper())):
+             token: str = Depends(oauth2_scheme)):
     user_db = db.query(Model_admin).filter(Model_admin.username == username).all()
     if user_db:
         raise HTTPException(status_code=400, detail='Username is taken')
