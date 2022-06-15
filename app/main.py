@@ -71,6 +71,11 @@ def get_update_failure_page(request: Request):   # 수정 실패시 뜨는 화�
     return templates.TemplateResponse("update_failure.html", context={"request": request})
 
 
+@app.get("/attendee_none", response_class=HTMLResponse)
+def get_attendee_none_page(request: Request):   # 출석시 입력값이 빠졌을 때
+    return templates.TemplateResponse("attendee_none.html", context={"request": request})
+
+
 @app.get("/attend_success", response_class=HTMLResponse)
 def get_attend_success(request: Request):   # 출석 완료창
     return templates.TemplateResponse("attend_success.html", context={"request": request})
@@ -98,7 +103,8 @@ def get_main_admin(request: Request, token: str = Depends(oauth2_scheme)):
 
 @app.post("/register")   # 관리자 계정 생성
 def register(username: str, password: str, db: Session = Depends(get_db),
-             token: str = Depends(oauth2_scheme)):
+             token: str = Depends(oauth2_scheme)
+             ):
     user_db = db.query(Model_admin).filter(Model_admin.username == username).all()
     if user_db:
         raise HTTPException(status_code=400, detail='Username is taken')

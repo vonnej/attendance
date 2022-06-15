@@ -90,16 +90,19 @@ def create_attendee_by_date(attendee_name: str = Form(...), attend_date: date = 
 def create_attendee(attendee_name: str = Form(...), attend_date: date = datetime.today(),
                     db: Session = Depends(get_db)):  # 참석자: 출석 기능(당일 출석은 당일날만 가능)
     # Attendees 데이터베이스 모델 인스턴스 생성                                          # 폼데이터
-    # attendee = db.query(Model_attendee).get((attendee_name, attend_date))
+    attendee = db.query(Model_attendee).get((attendee_name, attend_date))
     try:
-        attendee_db = Model_attendee(attendee_name=attendee_name,
-                                     attend_date=attend_date,
-                                     create_time=datetime.now()
-                                     )
-        db.add(attendee_db)  # 세션에 추가하고 커밋
-        db.commit()
+        if not attendee:
+            attendee_db = Model_attendee(attendee_name=attendee_name,
+                                         attend_date=datetime.today(),
+                                         create_time=datetime.now()
+                                         )
+            db.add(attendee_db)  # 세션에 추가하고 커밋
+            db.commit()
+            return RedirectResponse(url="/attendees_today", status_code=302)
 
-        return RedirectResponse(url="/attendees_today", status_code=302)
+        # elif attendee_name is None:
+        #     return RedirectResponse(url="/attendee_none", status_code=302)
 
     except sqlalchemy.exc.IntegrityError:
         db.rollback()
